@@ -1,4 +1,4 @@
-edefmodule Lngrpc.Plugs.Lsat do
+defmodule Lngrpc.Plugs.Lsat do
   @moduledoc """
       Plug to handle an LSAT-compliant authentication flow.
       If no mac, instruct LND to create one.
@@ -12,8 +12,8 @@ edefmodule Lngrpc.Plugs.Lsat do
   @doc """
   Matches on the authorization header of the form Authorization "LSAT <macaroon>:<preimage>.
   """
-  def call(%Plug.Conn{req_headers: [{"Authorization", value}]} = conn, _opts) do
-    case valid_lsat? do
+  def call(%Plug.Conn{req_headers: [{"Authorization", lsat}]} = conn, _opts) do
+    case valid_lsat?(lsat) do
       {:ok, msg} -> validate_preimage(msg)
       {:error, msg} -> msg
     end
