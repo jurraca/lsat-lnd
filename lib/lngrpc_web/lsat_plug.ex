@@ -1,11 +1,8 @@
-defmodule Lngrpc.Plugs.Lsat do
+edefmodule Lngrpc.Plugs.Lsat do
   @moduledoc """
       Plug to handle an LSAT-compliant authentication flow.
-      First, check if the user has a macaroon set on the session.
-      Then, check
-      Then, check that macaroon against existing grants.
-      If no mac, instruct LND to create one. X
-      Respond to client with mac and invoice as a cookie. X
+      If no mac, instruct LND to create one.
+      Respond to client with mac and invoice in authenticate header.
       Client pays invoice, receives preimage.
       User responds with mac and preimage via Authorization field.
   """
@@ -13,8 +10,7 @@ defmodule Lngrpc.Plugs.Lsat do
   def init(opts), do: opts
 
   @doc """
-  Matches on the authorization header.
-  should be Authorization: LSAT AGIAJEemVQUTEyNCR0exk7ek90Cg==:1234abcd1234abcd1234abcd
+  Matches on the authorization header of the form Authorization: LSAT EXAMPLE9dTEyNCR0exk7ek90Cg==:1234abcd1234abcd1234abcd
   """
   def call(%Plug.Conn{req_headers: [{"Authorization", value}]} = conn, _opts) do
     IO.inspect(value, label: "Auth")
