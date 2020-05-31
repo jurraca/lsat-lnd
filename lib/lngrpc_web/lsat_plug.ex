@@ -13,10 +13,8 @@ edefmodule Lngrpc.Plugs.Lsat do
   Matches on the authorization header of the form Authorization "LSAT <macaroon>:<preimage>.
   """
   def call(%Plug.Conn{req_headers: [{"Authorization", value}]} = conn, _opts) do
-    IO.inspect(value, label: "Auth")
-
-    case valid_lsat?(value) do
-      {:ok, msg} -> msg
+    case valid_lsat? do
+      {:ok, msg} -> validate_preimage(msg)
       {:error, msg} -> msg
     end
   end
@@ -35,6 +33,10 @@ edefmodule Lngrpc.Plugs.Lsat do
 
   def call(conn, _opts) do
     conn
+  end
+
+  def validate_preimage(%{macaroon: mac, preimage: preimage}) do
+    #TODO
   end
 
   defp build_lsat() do
@@ -62,16 +64,9 @@ edefmodule Lngrpc.Plugs.Lsat do
   def valid_lsat?(lsat) do
     # regex to extract mac and preimage
     regex = ~r{^LSAT\s(?<mac>.+):(?<preimage>[[:alnum:]]+)$}
-    %{"mac" => mac, "preimage" => preimage} = Regex.named_captures(regex, lsat)
-    {:ok, %{macaroon: mac, preimage: preimage}}
-  end
-
-  def valid_lsat?(lsat) do
-    # invalid LSAT
-  end
-
- # fetch an existing macaroon
-  def fetch_macaroon() do
-    nil
+    case Regex.named_captures(regex, lsat) do
+      %{"mac" => mac, "preimage" => preimage} -> {:ok, %{macaroon: mac, preimage: preimage}}
+      _ -> {:error, "Invalid LSAT"}
+    end
   end
 end
