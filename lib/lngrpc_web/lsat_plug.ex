@@ -10,7 +10,7 @@ edefmodule Lngrpc.Plugs.Lsat do
   def init(opts), do: opts
 
   @doc """
-  Matches on the authorization header of the form Authorization: LSAT EXAMPLE9dTEyNCR0exk7ek90Cg==:1234abcd1234abcd1234abcd
+  Matches on the authorization header of the form Authorization "LSAT <macaroon>:<preimage>.
   """
   def call(%Plug.Conn{req_headers: [{"Authorization", value}]} = conn, _opts) do
     IO.inspect(value, label: "Auth")
@@ -23,10 +23,9 @@ edefmodule Lngrpc.Plugs.Lsat do
 
   @doc """
   No Authorization header.
-  Set WWW-Authenticate: LSAT macaroon="AGIAJEemVQUTEyNCR0exk7ek90Cg==", invoice="lnbc1500n1pw5kjhmpp5fu6xhthlt2...f4sd"
+  Set WWW-Authenticate: "LSAT macaroon=<mac>, invoice=<invoice>"
   """
   def call(%Plug.Conn{} = conn, _opts) do
-
     lsat = build_lsat()
 
     conn
@@ -35,11 +34,10 @@ edefmodule Lngrpc.Plugs.Lsat do
   end
 
   def call(conn, _opts) do
-    IO.inspect("fallback")
     conn
   end
 
-  def build_lsat() do
+  defp build_lsat() do
     {:ok, channel} = Lnrpc.Utils.setup()
     mac = macaroon_request(channel) |> Base.encode64()
     %{payment_request: invoice, r_hash: _hash} = invoice_request(channel)
