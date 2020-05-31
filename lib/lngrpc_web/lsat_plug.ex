@@ -36,7 +36,7 @@ defmodule Lngrpc.Plugs.Lsat do
   end
 
   def validate_preimage(%{macaroon: mac, preimage: preimage}) do
-    #TODO
+    # TODO
   end
 
   defp build_lsat() do
@@ -64,6 +64,7 @@ defmodule Lngrpc.Plugs.Lsat do
   def valid_lsat?(lsat) do
     # regex to extract mac and preimage
     regex = ~r{^LSAT\s(?<mac>.+):(?<preimage>[[:alnum:]]+)$}
+
     case Regex.named_captures(regex, lsat) do
       %{"mac" => mac, "preimage" => preimage} -> {:ok, %{macaroon: mac, preimage: preimage}}
       _ -> {:error, "Invalid LSAT"}
