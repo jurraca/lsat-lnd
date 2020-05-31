@@ -7,7 +7,8 @@ defmodule Lnrpc.Utils do
       Create a GRPC cred via SSL, using the lnd cert, usually at `~/.lnd/tls.cert`.
       Returns a %GRPC.Credential struct
   """
-  def build_credentials(cert_path \\ "/home/jurraca/.lnd/tls.cert") do
+  def build_credentials() do
+    cert_path = Application.get_env(:lngrpc, :cert)
     %GRPC.Credential{ssl: [cacertfile: cert_path]}
   end
 

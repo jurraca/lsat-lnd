@@ -20,7 +20,6 @@ defmodule Lngrpc.Plugs.Lsat do
     IO.inspect(value, label: "Auth")
 
     case valid_lsat?(value) do
-      # validate macaroon and preimage
       {:ok, msg} -> msg
       {:error, msg} -> msg
     end
